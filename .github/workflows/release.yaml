@@ -1,44 +1,37 @@
-name: Release
+---
+name: release
 
 on:
   create:
     tags:
-      - 'v*'
+      - '*'
+
+permissions:
+  packages: write
+  contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-22.04
+
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Fetch tags
+        run: |
+          git fetch --force --tags
 
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.18
-
-      - name: Get dependencies
-        run: make deps
-
-      - name: Run tests
-        run: make test
-
-      - name: Build
-        run: |
-          GOOS=linux GOARCH=amd64 go build -o bin/tc-redirect-tap-amd64 ./cmd/tc-redirect-tap
-          GOOS=linux GOARCH=arm64 go build -o bin/tc-redirect-tap-arm64 ./cmd/tc-redirect-tap
-
-      - name: Sign
-        run: |
-          echo "${{ hashFiles('bin/tc-redirect-tap-amd64') }}" > bin/tc-redirect-tap-amd64.sha256
-          echo "${{ hashFiles('bin/tc-redirect-tap-arm64') }}" > bin/tc-redirect-tap-arm64.sha256
+          go-version: stable
 
       - name: Release
-        uses: softprops/action-gh-release@v1
+        uses: goreleaser/goreleaser-action@v4
         with:
-          files: |
-            bin/tc-redirect-tap-amd64
-            bin/tc-redirect-tap-arm64
-            bin/tc-redirect-tap-amd64.sha256
-            bin/tc-redirect-tap-arm64.sha256
+          args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,36 @@
+---
+builds:
+- id: tcp-redirect-tap
+  main: ./cmd/tc-redirect-tap
+  env:
+  - CGO_ENABLED=0
+  ldflags:
+  - -X github.com/hostinger/tc-redirect-tap/build.GitTag={{ .Version }}
+  - -X github.com/hostinger/tc-redirect-tap/build.GitCommit={{ .Commit }}
+  - -X github.com/hostinger/tc-redirect-tap/build.BuildDate={{ .Date }}
+  goos:
+  - linux
+  goarch:
+  - amd64
+  - arm64
+  binary: tc-redirect-tap
+
+archives:
+- id: tcp-redirect-tap
+  builds:
+  - tcp-redirect-tap
+  name_template: tcp-redirect-tap-v{{ .Version }}-{{ .Os }}-{{ .Arch }}
+  format: tar.gz
+  files:
+  - src: LICENSE
+    dst: LICENSE
+  - src: README.md
+    dst: README.md
+  - src: release/{{ .Arch }}
+    dst: .
+
+release:
+  draft: true
+
+changelog:
+  sort: asc
