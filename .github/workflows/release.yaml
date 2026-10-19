@@ -30,7 +30,7 @@ jobs:
           go-version: stable
 
       - name: Release
-        uses: goreleaser/goreleaser-action@v4
+        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7
         with:
           args: release --clean
         env:
