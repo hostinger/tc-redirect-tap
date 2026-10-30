@@ -1,33 +1,32 @@
 ---
+version: 2
+
 builds:
-- id: tcp-redirect-tap
+- id: tc-redirect-tap
   main: ./cmd/tc-redirect-tap
+  binary: tc-redirect-tap
   env:
   - CGO_ENABLED=0
   ldflags:
-  - -X github.com/hostinger/tc-redirect-tap/build.GitTag={{ .Version }}
-  - -X github.com/hostinger/tc-redirect-tap/build.GitCommit={{ .Commit }}
-  - -X github.com/hostinger/tc-redirect-tap/build.BuildDate={{ .Date }}
+  - -s -w -X github.com/containernetworking/plugins/pkg/utils/buildversion.BuildVersion={{ .Version }}
   goos:
   - linux
   goarch:
   - amd64
   - arm64
-  binary: tc-redirect-tap
 
+# Raw binaries named tc-redirect-tap-<arch>, the asset names installers download.
 archives:
-- id: tcp-redirect-tap
-  builds:
-  - tcp-redirect-tap
-  name_template: tcp-redirect-tap-v{{ .Version }}-{{ .Os }}-{{ .Arch }}
-  format: tar.gz
-  files:
-  - src: LICENSE
-    dst: LICENSE
-  - src: README.md
-    dst: README.md
-  - src: release/{{ .Arch }}
-    dst: .
+- id: tc-redirect-tap
+  ids:
+  - tc-redirect-tap
+  formats:
+  - binary
+  name_template: tc-redirect-tap-{{ .Arch }}
+
+checksum:
+  name_template: checksums.txt
+  algorithm: sha256
 
 release:
   draft: true
